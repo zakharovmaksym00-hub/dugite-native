@@ -29,7 +29,14 @@ jobs:
       contents: write
       pull-requests: write
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: generate-token
+        with:
+          app-id: ${{ vars.RELEASES_APP_ID }}
+          private-key: ${{ secrets.RELEASES_APP_KEY }}
       - uses: actions/checkout@v5
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -70,11 +77,6 @@ jobs:
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
             github.run_id }}
         run: node ./script/generate-release-pr-contents.mjs >> $GITHUB_OUTPUT
-      - uses: actions/create-github-app-token@v1
-        id: generate-token
-        with:
-          app-id: ${{ vars.RELEASES_APP_ID }}
-          private-key: ${{ secrets.RELEASES_APP_KEY }}
       - name: Create pull request
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
