@@ -83,6 +83,7 @@ jobs:
             ${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com
           GIT_COMMITTER_NAME: dugite-releases[bot]
           GIT_COMMITTER_EMAIL: 241944550+dugite-releases[bot]@users.noreply.github.com
+          PR_TITLE: ${{ steps.pr-contents.outputs.title }}
         run: |
           branch="update-dependencies-auto-${{ github.run_id }}"
           git checkout -b "$branch"
@@ -91,9 +92,9 @@ jobs:
             echo "No dependency changes detected; skipping commit, push, and pull request creation."
             exit 0
           fi
-          git commit -m "${{ steps.pr-contents.outputs.title }}"
+          git commit -m "$PR_TITLE"
           git push origin "$branch"
           gh pr create \
-            --title "${{ steps.pr-contents.outputs.title }}" \
+            --title "$PR_TITLE" \
             --body-file ./pr-body.md \
             --head "$branch"
