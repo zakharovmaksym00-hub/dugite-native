@@ -94,12 +94,12 @@ jobs:
           git tag ${{ github.event.inputs.version }}
           git push origin ${{ github.event.inputs['dry-run'] == 'true' && '--dry-run ' || ''  }}${{ github.event.inputs.version }}
       - name: Release
-        uses: softprops/action-gh-release@v2
         if: ${{ github.event.inputs['dry-run'] != 'true' }}
-        with:
-          body_path: ${{ github.workspace }}/script/release_notes.txt
-          tag_name: ${{ github.event.inputs.version }}
-          draft: ${{ github.event.inputs.draft }}
-          prerelease: ${{ github.event.inputs.prerelease }}
-          files: ${{ github.workspace }}/artifacts/dugite-*
-          fail_on_unmatched_files: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ github.event.inputs.version }} \
+            --notes-file ${{ github.workspace }}/script/release_notes.txt \
+            ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} \
+            ${{ github.event.inputs.prerelease == 'true' && '--prerelease' || '' }} \
+            ${{ github.workspace }}/artifacts/dugite-*
