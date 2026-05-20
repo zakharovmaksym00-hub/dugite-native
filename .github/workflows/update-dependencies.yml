@@ -87,6 +87,10 @@ jobs:
           branch="update-dependencies-auto-${{ github.run_id }}"
           git checkout -b "$branch"
           git add -A
+          if git diff --cached --quiet; then
+            echo "No dependency changes detected; skipping commit, push, and pull request creation."
+            exit 0
+          fi
           git commit -m "${{ steps.pr-contents.outputs.title }}"
           git push origin "$branch"
           gh pr create \
